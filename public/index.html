@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        *{
+            font-family: 'Segoe UI';  
+        }
+
+
+        table{
+            border:1px solid black;
+            width:400px;
+            margin:auto;
+            text-align:center; 
+            margin-top:100px;
+        }
+        
+        .star{
+            background-color:black;
+            color:white; 
+        }
+
+        td{
+            border:1px solid black;
+        }
+
+        button{
+            background-color:red; 
+            color:white; 
+            cursor:pointer; 
+        }
+    </style>
+</head>
+<body>
+    <table class="container">
+        <thead>
+            <tr>
+                <td><input type="text" placeholder="Name..." class="name"/></td>
+                <td><input type="text" placeholder="Age..." class="age"/></td>
+                <td><input type="text" placeholder="City..." class="city"/></td>
+                <td><button class="search">SEARCH</button></td>
+             </tr>
+        </thead>
+        <thead class="star">
+            <tr>
+                <td>Name</td>
+                <td>Age</td>
+                <td>City</td>
+                <td>Filler Text</td>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <button style="margin-left:470px;margin-top:20px;" class="reload">Reload Screen</button>
+    <p style="margin-left:470px;margin-top:20px;width:600px;">Notes: Backend based search. Basically every search term is a query. Has issues. For example, it is not case sensitive, does not fetch using only first names, fetches multiple records even though you explicitly specify the full name, just because the fetched records match with age and city criteria.</p>
+    <script>
+        window.addEventListener('DOMContentLoaded', function () {
+            fetch('http://localhost:3000/search')
+                .then((res) => {
+                    return res.json()
+                })
+                .then((data) => {
+                    console.log(data.users)
+                    data.users.forEach((u) => {
+                        document.querySelector('.container tbody').innerHTML += `
+                            <tr class="content"><td>${u.name}</td><td>${u.age}</td><td>${u.city}</td><td>filler text</td></tr>
+                        `;
+                    })
+                })
+        })
+
+
+        document.querySelector('.search').addEventListener('click', function () {
+            var name = document.querySelector('.name').value; 
+            var age = document.querySelector('.age').value; 
+            var city = document.querySelector('.city').value;
+            //alert(name + age + city)
+
+            fetch(`http://localhost:3000/search?name=${name}&age=${age}&city=${city}`)
+                .then((res) => {
+                    return res.json(); 
+                })
+                .then((data) => {
+                    console.log(data.filteredUsers);
+                    
+                    document.querySelector('.container tbody').innerHTML = '';
+                    data.filteredUsers.forEach((fu) => {
+                         
+                        document.querySelector('.container tbody').innerHTML += `
+                            <tr class="content"><td>${fu.name}</td><td>${fu.age}</td><td>${fu.city}</td><td>filler text</td></tr>
+                        `;
+                    })
+                })
+
+        })
+
+        document.querySelector('.reload').addEventListener('click', function () {
+            window.location.reload(); 
+        })
+
+
+    </script>
+</body>
+</html>
